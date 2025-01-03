@@ -1,13 +1,15 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
-import OpenAI from 'openai';  // Import the default OpenAI class
 
 dotenv.config();
 
 const router = express.Router();
 
+// Try CommonJS-style import
+const { OpenAI } = await import('openai');
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,  // Use your OpenAI API key from .env
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 router.route('/').get((req, res) => {
@@ -24,15 +26,13 @@ router.route('/').post(async (req, res) => {
       size: '1024x1024',
     });
 
-    // Assuming the API returns a URL for the image
-    const imageUrl = aiResponse.data[0].url;  // Get the image URL from OpenAI's response
+    const imageUrl = aiResponse.data[0].url;
 
-    // Send the URL as a response
     res.status(200).json({ photo: imageUrl });
   } catch (error) {
     console.error(error);
     const errorMessage = error?.response?.data?.error?.message || 'Something went wrong';
-    res.status(500).json({ error: errorMessage });  // Send error as JSON
+    res.status(500).json({ error: errorMessage });
   }
 });
 
